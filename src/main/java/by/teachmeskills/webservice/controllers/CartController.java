@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +46,7 @@ public class CartController {
     public ResponseEntity<CartDto> addProduct(@PathVariable @Positive int id, @RequestBody CartDto cartDto) {
         return new ResponseEntity<>(cartService.addProduct(id, cartDto), HttpStatus.OK);
     }
+
     @Operation(
             summary = "Delete product",
             description = "Delete product from shopping cart",
@@ -65,6 +65,7 @@ public class CartController {
     public ResponseEntity<CartDto> removeProduct(@PathVariable @Positive int id, @RequestBody CartDto cartDto) {
         return new ResponseEntity<>(cartService.removeProduct(id, cartDto), HttpStatus.OK);
     }
+
     @Operation(
             summary = "Delete all products",
             description = "Delete all products from cart",
@@ -72,7 +73,7 @@ public class CartController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Products was deleted from cart"
+                    description = "Products were deleted from cart"
             )
     })
     @DeleteMapping("/clear")

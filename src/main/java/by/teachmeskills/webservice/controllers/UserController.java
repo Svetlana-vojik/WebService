@@ -4,6 +4,7 @@ import by.teachmeskills.webservice.dto.LoginUserDto;
 import by.teachmeskills.webservice.dto.UserDto;
 import by.teachmeskills.webservice.exceptions.AuthorizationException;
 import by.teachmeskills.webservice.services.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @RequestMapping("/users")
 @AllArgsConstructor
 @Validated
+@Tag(name = "user", description = "User Endpoint")
 public class UserController {
     private final UserService userService;
 

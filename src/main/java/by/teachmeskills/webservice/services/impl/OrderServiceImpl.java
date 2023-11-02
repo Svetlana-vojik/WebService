@@ -6,13 +6,31 @@ import by.teachmeskills.webservice.converters.UserConverter;
 import by.teachmeskills.webservice.dto.OrderDto;
 import by.teachmeskills.webservice.dto.ProductDto;
 import by.teachmeskills.webservice.entities.Order;
+import by.teachmeskills.webservice.exceptions.ExportFIleException;
 import by.teachmeskills.webservice.repositories.OrderRepository;
+import by.teachmeskills.webservice.repositories.ProductRepository;
 import by.teachmeskills.webservice.repositories.UserRepository;
 import by.teachmeskills.webservice.services.OrderService;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.hibernate.query.sqm.ParsingException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,10 +38,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
-    private final UserConverter userConverter;
     private final ProductConverter productConverter;
     private final OrderConverter orderConverter;
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
 
  @Override
  public OrderDto updateOrder(OrderDto orderDto) {
@@ -75,5 +93,46 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderDto> getAllOrders() {
         return orderRepository.findAll().stream().map(orderConverter::toDto).toList();
     }
+    @Override
+    public List<OrderDto> importOrdersFromCsv(MultipartFile file) {
+        List<OrderDto> csvOrders = parseCsv(file);
+        List<Order> orders = Optional.ofNullable(csvOrders)
+                .map(list -> list.stream()
+                        .map(orderConverter::fromDto)
+                        .toList())
+                .orElse(null);
+        if (Optional.ofNullable(orders).isPresent()) {
+            orders.forEach(orderRepository::createOrUpdateOrder);
+            return orders.stream().map(orderConverter::toDto).toList();
+        }
+        return Collections.emptyList();
+    }
 
+    @Override
+    public void exportOrdersToCsv(HttpServletResponse response, int id) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+        List<ProductDto> products = productRepository.findByCategoryId(id).stream().map(productConverter::toDto).toList();
+        try (Writer writer = new OutputStreamWriter(response.getOutputStream())) {
+            StatefulBeanToCsv<ProductDto> statefulBeanToCsv = new StatefulBeanToCsvBuilder<ProductDto>(writer).withSeparator(';').build();
+            response.setContentType("text/csv");
+            response.addHeader("Content-Disposition", "attachment; filename=" + "products.csv");
+            statefulBeanToCsv.write(products);
+        }
+    }
+
+    private List<OrderDto> parseCsv(MultipartFile file) {
+        if (Optional.ofNullable(file).isPresent()) {
+            try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+                CsvToBean<OrderDto> csvToBean = new CsvToBeanBuilder<OrderDto>(reader)
+                        .withType(OrderDto.class)
+                        .withIgnoreLeadingWhiteSpace(true)
+                        .withSeparator(',')
+                        .build();
+
+                return csvToBean.parse();
+            } catch (Exception ex) {
+                throw new ParsingException(String.format("Ошибка во время преобразования данных: %s", ex.getMessage()));
+            }
+        }
+        return Collections.emptyList();
+    }
 }
