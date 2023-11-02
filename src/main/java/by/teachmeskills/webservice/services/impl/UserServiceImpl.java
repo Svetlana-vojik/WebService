@@ -50,6 +50,12 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(UserDto userDto) {
         User user = Optional.ofNullable(userRepository.findById(userDto.getId()))
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with id %d not found", userDto.getId())));
+        user.setEmail(userDto.getEmail());
+        user.setPassword(userDto.getPassword());
+        user.setName(userDto.getName());
+        user.setSurname(userDto.getSurname());
+        user.setBirthday(userDto.getBirthday());
+        user.setBalance(userDto.getBalance());
         user.setAddress(userDto.getAddress());
         return userConverter.toDto(userRepository.createOrUpdateUser(user));
     }

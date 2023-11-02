@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -51,9 +52,8 @@ public class User extends BaseEntity {
     @Column()
     private String surname;
 
-    @NotNull
-    @Pattern(regexp = "\\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])*", message = "Некорректная дата рождения")
-    @Column()
+    @NotNull(message = "поле не должно быть пустым")
+    @Past(message = "Некорректная дата.")
     private LocalDate birthday;
 
     @Column()

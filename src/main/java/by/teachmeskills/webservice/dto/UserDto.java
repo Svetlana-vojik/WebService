@@ -41,7 +41,7 @@ public class UserDto extends BaseDto {
     @Pattern(regexp = "[A-Za-z А-Яа-я]+", message = "Некорректная фамилия.")
     private String surname;
 
-    @NotNull(message = "дата рождения не должна быть пустой")
+    @NotNull(message = "поле не должно быть пустым")
     @Past(message = "Некорректная дата.")
     private LocalDate birthday;
 
