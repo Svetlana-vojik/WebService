@@ -29,7 +29,7 @@ public class CartController {
         return new ResponseEntity<>(cartService.addProduct(id, cartDto), HttpStatus.OK);
     }
 
-    @DeleteMapping("/removeProduct/{id}")
+    @DeleteMapping("/deleteProduct/{id}")
     public ResponseEntity<CartDto> removeProduct(@PathVariable @Positive int id, @RequestBody CartDto cartDto) {
         return new ResponseEntity<>(cartService.removeProduct(id, cartDto), HttpStatus.OK);
     }
