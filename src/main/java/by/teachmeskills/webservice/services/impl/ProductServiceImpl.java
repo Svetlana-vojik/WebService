@@ -61,6 +61,9 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Product with id %d not found", productDto.getId())));
         product.setName(productDto.getName());
         product.setDescription(productDto.getDescription());
+        product.setPrice(productDto.getPrice());
+        productDto.setCategoryId(productDto.getCategoryId());
+        product.setImagePath(productDto.getImagePath());
         return productConverter.toDto(productRepository.createOrUpdateProduct(product));
     }
 
