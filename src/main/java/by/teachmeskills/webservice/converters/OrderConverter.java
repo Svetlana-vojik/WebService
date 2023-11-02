@@ -29,13 +29,10 @@ public class OrderConverter {
     }
 
     public Order fromDto(OrderDto orderDto) {
-        return Optional.ofNullable(orderDto).map(o -> Order.builder()
-                        .orderDate(o.getOrderDate())
-                        .price(o.getPrice())
-                        .user(userRepository.findById(o.getUserId()))
-                        .productList(Optional.ofNullable(o.getProductList()).map(products -> products
-                                .stream().map(productConverter::fromDto).toList()).orElse(List.of()))
-                        .build())
-                .orElse(null);
+        return Order.builder()
+                .orderDate(orderDto.getOrderDate())
+                .price(orderDto.getPrice())
+                .user(userRepository.findById(orderDto.getUserId()))
+                .build();
     }
 }

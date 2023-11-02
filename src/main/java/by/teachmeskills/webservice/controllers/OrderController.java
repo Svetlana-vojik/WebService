@@ -1,10 +1,7 @@
 package by.teachmeskills.webservice.controllers;
 
-import by.teachmeskills.webservice.dto.CartDto;
 import by.teachmeskills.webservice.dto.OrderDto;
 import by.teachmeskills.webservice.dto.ProductDto;
-import by.teachmeskills.webservice.dto.UserDto;
-import by.teachmeskills.webservice.exceptions.CartIsEmptyException;
 import by.teachmeskills.webservice.services.OrderService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -34,13 +31,18 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<OrderDto> createOrder(@RequestBody CartDto cartDto, @RequestBody @Valid UserDto userDto) throws CartIsEmptyException {
-        return new ResponseEntity<>(orderService.create(userDto, cartDto), HttpStatus.CREATED);
+    public ResponseEntity<OrderDto> createOrder(@RequestBody @Valid OrderDto orderDto) {
+        return new ResponseEntity<>(orderService.createOrder(orderDto), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<OrderDto> updateOrder(@RequestBody @Valid OrderDto orderDto) {
         return new ResponseEntity<>(orderService.updateOrder(orderDto), HttpStatus.OK);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<OrderDto>> getAllOrders() {
+        return new ResponseEntity<>(orderService.getAllOrders(), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

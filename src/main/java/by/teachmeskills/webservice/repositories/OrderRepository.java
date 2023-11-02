@@ -12,5 +12,7 @@ public interface OrderRepository {
 
     void delete(int id);
 
+    List<Order> findAll();
+
     List<Order> findByUserId(int id);
 }

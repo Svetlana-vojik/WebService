@@ -38,6 +38,10 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Order with id %d not found", id)));
         entityManager.remove(order);
     }
+    @Override
+    public List<Order> findAll() {
+        return entityManager.createQuery("select o from Order o ", Order.class).getResultList();
+    }
 
     @Override
     public List<Order> findByUserId(int id) {
