@@ -44,7 +44,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable @Positive int id) {
+    public void deleteOrder(@PathVariable @Positive int id) {
         orderService.deleteOrder(id);
     }
 

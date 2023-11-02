@@ -19,8 +19,8 @@ public class OrderConverter {
     public OrderDto toDto(Order order) {
         return Optional.ofNullable(order).map(o -> OrderDto.builder()
                         .id(o.getId())
-                        .price(o.getPrice())
                         .orderDate(o.getOrderDate())
+                        .price(o.getPrice())
                         .userId(o.getUser().getId())
                         .productList(Optional.ofNullable(o.getProductList()).map(products -> products
                                 .stream().map(productConverter::toDto).toList()).orElse(List.of()))
@@ -30,8 +30,8 @@ public class OrderConverter {
 
     public Order fromDto(OrderDto orderDto) {
         return Optional.ofNullable(orderDto).map(o -> Order.builder()
-                        .price(o.getPrice())
                         .orderDate(o.getOrderDate())
+                        .price(o.getPrice())
                         .user(userRepository.findById(o.getUserId()))
                         .productList(Optional.ofNullable(o.getProductList()).map(products -> products
                                 .stream().map(productConverter::fromDto).toList()).orElse(List.of()))

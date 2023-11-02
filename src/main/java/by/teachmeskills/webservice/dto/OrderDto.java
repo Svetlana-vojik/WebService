@@ -2,7 +2,7 @@ package by.teachmeskills.webservice.dto;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,15 +19,15 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderDto extends BaseDto {
 
-    @Past
+    @PastOrPresent
     private LocalDate orderDate;
 
+    @NotNull(message = "Поле должно быть заполнено!")
     @Digits(integer = 5, fraction = 2)
     private int price;
 
-    @NotNull
+    @NotNull(message = "Поле должно быть заполнено!")
     private int userId;
 
-    @NotNull
     private List<ProductDto> productList;
 }
