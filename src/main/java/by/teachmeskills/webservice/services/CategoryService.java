@@ -1,7 +1,6 @@
 package by.teachmeskills.webservice.services;
 
 import by.teachmeskills.webservice.dto.CategoryDto;
-import by.teachmeskills.webservice.exceptions.ExportFIleException;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import jakarta.servlet.http.HttpServletResponse;
