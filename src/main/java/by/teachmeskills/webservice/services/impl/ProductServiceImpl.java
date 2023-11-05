@@ -6,10 +6,26 @@ import by.teachmeskills.webservice.entities.Product;
 import by.teachmeskills.webservice.repositories.CategoryRepository;
 import by.teachmeskills.webservice.repositories.ProductRepository;
 import by.teachmeskills.webservice.services.ProductService;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.hibernate.query.sqm.ParsingException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,4 +89,48 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Product with id %d not found", id)));
         return productConverter.toDto(product);
     }
+    @Override
+    public List<ProductDto> importProductsFromCsv(MultipartFile file) {
+        List<ProductDto> csvProducts = parseCsv(file);
+        List<Product> orders = Optional.ofNullable(csvProducts)
+                .map(list -> list.stream()
+                        .map(productConverter::fromDto)
+                        .toList())
+                .orElse(null);
+        if (Optional.ofNullable(orders).isPresent()) {
+            orders.forEach(productRepository::createOrUpdateProduct);
+            return orders.stream().map(productConverter::toDto).toList();
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void exportProductsToCsv(HttpServletResponse response, int id) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+        List<ProductDto> products = productRepository.findByCategoryId(id).stream().map(productConverter::toDto).toList();
+        try (Writer writer = new OutputStreamWriter(response.getOutputStream())) {
+            StatefulBeanToCsv<ProductDto> statefulBeanToCsv = new StatefulBeanToCsvBuilder<ProductDto>(writer).withSeparator(';').build();
+            response.setContentType("text/csv");
+            response.addHeader("Content-Disposition", "attachment; filename=" + "products.csv");
+            statefulBeanToCsv.write(products);
+        }
+
+    }
+
+    private List<ProductDto> parseCsv(MultipartFile file) {
+        if (Optional.ofNullable(file).isPresent()) {
+            try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+                CsvToBean<ProductDto> csvToBean = new CsvToBeanBuilder<ProductDto>(reader)
+                        .withType(ProductDto.class)
+                        .withIgnoreLeadingWhiteSpace(true)
+                        .withSeparator(',')
+                        .build();
+
+                return csvToBean.parse();
+            } catch (Exception ex) {
+                throw new ParsingException(String.format("Ошибка во время преобразования данных: %s", ex.getMessage()));
+            }
+        }
+        return Collections.emptyList();
+    }
+
 }
