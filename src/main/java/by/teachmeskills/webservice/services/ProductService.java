@@ -8,7 +8,7 @@ public interface ProductService {
 
     List<ProductDto> getAllProducts();
 
-    List<ProductDto> getProductBySearch(String searchWord);
+    List<ProductDto> findProducts(String searchWord);
 
     List<ProductDto> getProductByCategoryId(int id);
 

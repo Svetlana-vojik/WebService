@@ -13,7 +13,7 @@ public interface ProductRepository {
 
     List<Product> findByCategoryId(int id);
 
-    List<Product> findProductsByWord(String searchWord);
+    List<Product> findProducts(String searchWord);
 
     List<Product> findAll();
 }

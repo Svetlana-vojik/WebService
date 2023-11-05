@@ -27,8 +27,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDto> getProductBySearch(String searchWord) {
-        return productRepository.findProductsByWord(searchWord).stream().map(productConverter::toDto).toList();
+    public List<ProductDto> findProducts(String searchWord) {
+        return productRepository.findProducts(searchWord).stream().map(productConverter::toDto).toList();
     }
 
     @Override

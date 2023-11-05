@@ -45,7 +45,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public List<Product> findProductsByWord(String searchWord) {
+    public List<Product> findProducts(String searchWord) {
         TypedQuery<Product> query = entityManager.createQuery("from Product where name like :search or description like :search", Product.class);
         query.setParameter("search", "%" + searchWord + "%");
         return query.getResultList();
