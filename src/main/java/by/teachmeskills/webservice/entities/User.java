@@ -31,19 +31,16 @@ public class User extends BaseEntity {
     @NotNull
     @NotBlank(message = "email не должен быть пустым")
     @Email(message = "Некорректный адрес электронной почты.")
-    @Column()
     private String email;
 
     @NotNull
     @NotNull(message = "пароль не должен быть пустым")
     @Size(min = 4, max = 10, message = "длина пароля должна быть от 4 до 10 символов")
-    @Column()
     private String password;
 
     @NotNull
     @NotBlank(message = "имя не должно быть пустым")
     @Pattern(regexp = "[A-Za-z А-Яа-я]+", message = "Некорректное имя.")
-    @Column()
     private String name;
 
     @NotNull
@@ -56,7 +53,6 @@ public class User extends BaseEntity {
     @Past(message = "Некорректная дата.")
     private LocalDate birthday;
 
-    @Column()
     private int balance;
 
     @NotNull(message = "поле не должно быть пустым")

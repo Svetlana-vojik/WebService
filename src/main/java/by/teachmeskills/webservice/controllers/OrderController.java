@@ -44,6 +44,7 @@ import java.util.Optional;
 public class OrderController {
 
     private final OrderService orderService;
+
     @Operation(
             summary = "Create order",
             description = "Create new order",
@@ -63,6 +64,7 @@ public class OrderController {
     public ResponseEntity<OrderDto> createOrder(@RequestBody @Valid OrderDto orderDto) {
         return new ResponseEntity<>(orderService.createOrder(orderDto), HttpStatus.CREATED);
     }
+
     @Operation(
             summary = "Update order",
             description = "Update existed order",
@@ -105,6 +107,7 @@ public class OrderController {
     public ResponseEntity<List<OrderDto>> getAllOrders() {
         return new ResponseEntity<>(orderService.getAllOrders(), HttpStatus.OK);
     }
+
     @Operation(
             summary = "Delete order",
             description = "Delete existed order",
@@ -145,6 +148,7 @@ public class OrderController {
                 .map(dto -> new ResponseEntity<>(dto, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
     @Operation(
             summary = "Find user orders",
             description = "Find all user orders in Shop",
@@ -166,6 +170,7 @@ public class OrderController {
                 .map(dto -> new ResponseEntity<>(dto, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
     @Operation(
             summary = "Find order products",
             description = "Find all order products in Shop",
@@ -187,6 +192,7 @@ public class OrderController {
                 .map(dto -> new ResponseEntity<>(dto, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
     @Operation(
             summary = "Import new orders",
             description = "Add new orders to Shop database from csv file",

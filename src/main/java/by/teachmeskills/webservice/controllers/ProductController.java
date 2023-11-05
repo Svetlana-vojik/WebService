@@ -182,8 +182,8 @@ public class ProductController {
             )
     })
     @GetMapping("/search/{searchWord}")
-    public ResponseEntity<List<ProductDto>> getProductBySearch(@PathVariable String searchWord) {
-        return new ResponseEntity<>(productService.getProductBySearch(searchWord), HttpStatus.OK);
+    public ResponseEntity<List<ProductDto>> findProducts(@PathVariable String searchWord) {
+        return new ResponseEntity<>(productService.findProducts(searchWord), HttpStatus.OK);
     }
 
     @Operation(

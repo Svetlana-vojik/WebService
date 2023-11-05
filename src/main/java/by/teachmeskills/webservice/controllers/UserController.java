@@ -98,7 +98,7 @@ public class UserController {
                     description = "User not created"
             )
     })
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto) {
         return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
@@ -138,7 +138,7 @@ public class UserController {
                     description = "User not updated"
             )
     })
-    @PutMapping
+    @PutMapping("/update")
     public ResponseEntity<UserDto> updateUser(@RequestBody @Valid UserDto userDto) {
         return new ResponseEntity<>(userService.updateUser(userDto), HttpStatus.OK);
     }

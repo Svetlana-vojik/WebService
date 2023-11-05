@@ -22,13 +22,11 @@ import java.util.List;
 @Entity
 @Table(name = "categories")
 public class Category extends BaseEntity {
-    @Column()
     private String name;
 
     @Column(name = "image_path")
     private String imagePath;
 
-    @Column()
     private int rating;
 
     @OneToMany(mappedBy = "category", orphanRemoval = true, cascade = CascadeType.ALL)
