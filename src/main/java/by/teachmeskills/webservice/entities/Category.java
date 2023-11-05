@@ -28,7 +28,6 @@ public class Category extends BaseEntity {
     private String imagePath;
 
     private int rating;
-
     @OneToMany(mappedBy = "category", orphanRemoval = true, cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

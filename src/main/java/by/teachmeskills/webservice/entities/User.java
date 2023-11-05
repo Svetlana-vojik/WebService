@@ -46,7 +46,6 @@ public class User extends BaseEntity {
     @NotNull
     @NotBlank(message = "фамилия не должна быть пустой")
     @Pattern(regexp = "[A-Za-z А-Яа-я]+", message = "Некорректная фамилия.")
-    @Column()
     private String surname;
 
     @NotNull(message = "поле не должно быть пустым")
@@ -57,7 +56,6 @@ public class User extends BaseEntity {
 
     @NotNull(message = "поле не должно быть пустым")
     @Pattern(regexp = "[A-Za-z А-Яа-я0-9\\d]+", message = "Некорректный адрес")
-    @Column()
     private String address;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
