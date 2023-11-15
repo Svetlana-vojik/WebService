@@ -13,7 +13,7 @@ public interface ProductService {
 
     List<ProductDto> getAllProducts();
 
-    List<ProductDto> findProducts(String searchWord);
+    List<ProductDto> findProducts(String parameter);
 
     List<ProductDto> getProductByCategoryId(int id);
 

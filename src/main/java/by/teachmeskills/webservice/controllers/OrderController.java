@@ -16,9 +16,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,12 +38,15 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/orders")
-@AllArgsConstructor
 @Validated
 @Tag(name = "order", description = "Order Endpoint")
 public class OrderController {
 
     private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @Operation(
             summary = "Create order",
@@ -61,6 +64,7 @@ public class OrderController {
             )
     })
     @PostMapping
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<OrderDto> createOrder(@RequestBody @Valid OrderDto orderDto) {
         return new ResponseEntity<>(orderService.createOrder(orderDto), HttpStatus.CREATED);
     }
@@ -212,6 +216,7 @@ public class OrderController {
             }
     )
     @PostMapping("/csv/import")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<OrderDto>> importOrdersFromCsv(@RequestParam("file") MultipartFile file) throws Exception {
         return new ResponseEntity<>(orderService.importOrdersFromCsv(file), HttpStatus.CREATED);
     }
@@ -235,6 +240,7 @@ public class OrderController {
             }
     )
     @GetMapping("/csv/export/{userId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void exportOrdersToCsv(HttpServletResponse response, @Parameter(required = true, description = "User ID")
     @PathVariable int userId) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
         orderService.exportOrdersToCsv(response, userId);

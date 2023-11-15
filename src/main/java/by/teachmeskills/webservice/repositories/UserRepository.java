@@ -1,17 +1,18 @@
 package by.teachmeskills.webservice.repositories;
 
 import by.teachmeskills.webservice.entities.User;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface UserRepository {
-    User createOrUpdateUser(User user);
-
-    List<User> findAllUsers();
-
-    void delete(int id);
-
+@Repository
+@Transactional
+public interface UserRepository extends JpaRepository<User, Integer> {
     User findById(int id);
 
     User findByEmailAndPassword(String email, String password);
+
+    Optional<User> findByEmail(String email);
 }

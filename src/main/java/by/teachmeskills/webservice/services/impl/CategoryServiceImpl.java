@@ -13,7 +13,6 @@ import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import org.hibernate.query.sqm.ParsingException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,14 +28,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryConverter categoryConverter;
 
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryConverter categoryConverter) {
+        this.categoryRepository = categoryRepository;
+        this.categoryConverter = categoryConverter;
+    }
+
     @Override
     public List<CategoryDto> getAllCategories() {
-        return categoryRepository.getAllCategories().stream().map(categoryConverter::toDto).toList();
+        return categoryRepository.findAll().stream().map(categoryConverter::toDto).toList();
     }
 
     @Override
@@ -49,7 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto) {
         Category category = categoryConverter.fromDto(categoryDto);
-        category = categoryRepository.createOrUpdateCategory(category);
+        category = categoryRepository.save(category);
         return categoryConverter.toDto(category);
     }
 
@@ -59,12 +62,12 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Category with id %d not found", categoryDto.getId())));
         category.setName(categoryDto.getName());
         category.setRating(categoryDto.getRating());
-        return categoryConverter.toDto(categoryRepository.createOrUpdateCategory(category));
+        return categoryConverter.toDto(categoryRepository.save(category));
     }
 
     @Override
     public void deleteCategory(int id) {
-        categoryRepository.delete(id);
+        categoryRepository.deleteById(id);
     }
 
     @Override
@@ -76,7 +79,7 @@ public class CategoryServiceImpl implements CategoryService {
                         .toList())
                 .orElse(null);
         if (Optional.ofNullable(categories).isPresent()) {
-            categories.forEach(categoryRepository::createOrUpdateCategory);
+            categories.forEach(categoryRepository::save);
             return categories.stream().map(categoryConverter::toDto).toList();
         }
         return Collections.emptyList();
@@ -84,7 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void exportCategoriesToCsv(HttpServletResponse response) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
-        List<CategoryDto> categories = categoryRepository.getAllCategories().stream().map(categoryConverter::toDto).toList();
+        List<CategoryDto> categories = categoryRepository.findAll().stream().map(categoryConverter::toDto).toList();
         try (Writer writer = new OutputStreamWriter(response.getOutputStream())) {
             StatefulBeanToCsv<CategoryDto> statefulBeanToCsv = new StatefulBeanToCsvBuilder<CategoryDto>(writer).withSeparator(';').build();
             response.setContentType("text/csv");

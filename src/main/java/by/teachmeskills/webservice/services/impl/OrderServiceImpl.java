@@ -47,19 +47,19 @@ public class OrderServiceImpl implements OrderService {
              .orElseThrow(() -> new EntityNotFoundException(String.format("Заказа с id %d не найдено.", orderDto.getId())));
      order.setOrderDate(orderDto.getOrderDate());
      order.setPrice(orderDto.getPrice());
-     return orderConverter.toDto(orderRepository.createOrUpdateOrder(order));
+     return orderConverter.toDto(orderRepository.save(order));
  }
 
     @Override
     public OrderDto createOrder(OrderDto orderDto) {
         Order order = orderConverter.fromDto(orderDto);
-        order = orderRepository.createOrUpdateOrder(order);
+        order = orderRepository.save(order);
         return orderConverter.toDto(order);
     }
 
     @Override
     public void deleteOrder(int id) {
-        orderRepository.delete(id);
+        orderRepository.deleteById(id);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
                         .toList())
                 .orElse(null);
         if (Optional.ofNullable(orders).isPresent()) {
-            orders.forEach(orderRepository::createOrUpdateOrder);
+            orders.forEach(orderRepository::save);
             return orders.stream().map(orderConverter::toDto).toList();
         }
         return Collections.emptyList();

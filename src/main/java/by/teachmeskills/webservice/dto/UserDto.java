@@ -28,7 +28,6 @@ public class UserDto extends BaseDto {
 
     @NotNull(message = "пароль не должен быть пустым")
     @NotBlank(message = "пароль не должен быть пустым")
-    @Size(min = 4, max = 10, message = "длина пароля должна быть от 4 до 10 символов")
     private String password;
 
     @NotNull(message = "имя не должен быть пустым")
@@ -52,4 +51,7 @@ public class UserDto extends BaseDto {
     private String address;
 
     private List<OrderDto> orders;
+
+    @NotNull(message = "Empty user roles")
+    private List<RoleDto> roles;
 }
