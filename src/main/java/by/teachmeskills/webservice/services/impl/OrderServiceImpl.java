@@ -107,13 +107,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void exportOrdersToCsv(HttpServletResponse response, int id) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
-        List<ProductDto> products = productRepository.findByCategoryId(id).stream().map(productConverter::toDto).toList();
+    public void exportOrdersToCsv(HttpServletResponse response, int userId) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+        List<OrderDto> orderDtos = orderRepository.findByUserId(userId).stream().map(orderConverter::toDto).toList();
         try (Writer writer = new OutputStreamWriter(response.getOutputStream())) {
-            StatefulBeanToCsv<ProductDto> statefulBeanToCsv = new StatefulBeanToCsvBuilder<ProductDto>(writer).withSeparator(';').build();
+            StatefulBeanToCsv<OrderDto> statefulBeanToCsv = new StatefulBeanToCsvBuilder<OrderDto>(writer).withSeparator(';').build();
             response.setContentType("text/csv");
             response.addHeader("Content-Disposition", "attachment; filename=" + "products.csv");
-            statefulBeanToCsv.write(products);
+            statefulBeanToCsv.write(orderDtos);
         }
     }
 
