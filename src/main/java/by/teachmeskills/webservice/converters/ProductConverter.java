@@ -27,7 +27,6 @@ public class ProductConverter {
 
     public Product fromDto(ProductDto productDto) {
         return Optional.ofNullable(productDto).map(p -> Product.builder()
-                        .id(p.getId())
                         .name(p.getName())
                         .description(p.getDescription())
                         .price(p.getPrice())

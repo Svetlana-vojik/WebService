@@ -15,9 +15,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,12 +37,15 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/categories")
-@AllArgsConstructor
 @Validated
 @Tag(name = "category", description = "Category Endpoint")
 public class CategoryController {
 
     private final CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     @Operation(
             summary = "Find all categories",
@@ -104,6 +108,7 @@ public class CategoryController {
             )
     })
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<CategoryDto> createCategory(@RequestBody @Valid CategoryDto categoryDto) {
         return new ResponseEntity<>(categoryService.createCategory(categoryDto), HttpStatus.CREATED);
     }
@@ -124,6 +129,7 @@ public class CategoryController {
             )
     })
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<CategoryDto> updateCategory(@RequestBody @Valid CategoryDto categoryDto) {
         return new ResponseEntity<>(categoryService.updateCategory(categoryDto), HttpStatus.OK);
     }
@@ -143,12 +149,13 @@ public class CategoryController {
             )
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteCategory(@PathVariable @Positive int id) {
         categoryService.deleteCategory(id);
     }
 
     @Operation(
-            summary = "Save new categories",
+            summary = "Import new categories",
             description = "Add new categories from csv file and persist to database",
             tags = {"category"}
     )
@@ -166,6 +173,7 @@ public class CategoryController {
             }
     )
     @PostMapping("/csv/import")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<CategoryDto>> importCategoriesFromCsv(@RequestParam("file") MultipartFile file) {
         return new ResponseEntity<>(categoryService.importCategoriesFromCsv(file), HttpStatus.CREATED);
     }
@@ -189,6 +197,7 @@ public class CategoryController {
             }
     )
     @GetMapping("/csv/export")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void exportCategoriesToCsv(HttpServletResponse response) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
         categoryService.exportCategoriesToCsv(response);
     }

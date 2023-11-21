@@ -13,9 +13,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,11 +32,14 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
-@AllArgsConstructor
 @Validated
 @Tag(name = "user", description = "User Endpoint")
 public class UserController {
     private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @Operation(
             summary = "Find all users",
@@ -102,27 +105,6 @@ public class UserController {
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto) {
         return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
-
-    @Operation(
-            summary = "Login user",
-            description = "Login existed user in Shop by his email and password",
-            tags = {"user"})
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "The user is logged in with their email address and password",
-                    content = @Content(schema = @Schema(contentSchema = UserDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "User isn't logged in - forbidden operation"
-            )
-    })
-    @PostMapping("/login")
-    public ResponseEntity<UserDto> loginUser(@RequestBody @Valid LoginUserDto userDto) throws AuthorizationException {
-        return new ResponseEntity<>(userService.loginUser(userDto), HttpStatus.OK);
-    }
-
     @Operation(
             summary = "Update user",
             description = "Update existed user",
@@ -139,6 +121,7 @@ public class UserController {
             )
     })
     @PutMapping("/update")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserDto> updateUser(@RequestBody @Valid UserDto userDto) {
         return new ResponseEntity<>(userService.updateUser(userDto), HttpStatus.OK);
     }

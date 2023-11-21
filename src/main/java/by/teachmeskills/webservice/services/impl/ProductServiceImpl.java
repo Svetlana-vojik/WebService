@@ -43,8 +43,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDto> findProducts(String searchWord) {
-        return productRepository.findProducts(searchWord).stream().map(productConverter::toDto).toList();
+    public List<ProductDto> findProducts(String parameter) {
+        return productRepository.findProducts(parameter).stream().map(productConverter::toDto).toList();
     }
 
     @Override
@@ -62,13 +62,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto createProduct(ProductDto productDto) {
         Product product = productConverter.fromDto(productDto);
-        product = productRepository.createOrUpdateProduct(product);
+        product = productRepository.save(product);
         return productConverter.toDto(product);
     }
 
     @Override
     public void deleteProduct(int id) {
-        productRepository.delete(id);
+        productRepository.deleteById(id);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(productDto.getPrice());
         productDto.setCategoryId(productDto.getCategoryId());
         product.setImagePath(productDto.getImagePath());
-        return productConverter.toDto(productRepository.createOrUpdateProduct(product));
+        return productConverter.toDto(productRepository.save(product));
     }
 
     @Override
@@ -98,7 +98,7 @@ public class ProductServiceImpl implements ProductService {
                         .toList())
                 .orElse(null);
         if (Optional.ofNullable(orders).isPresent()) {
-            orders.forEach(productRepository::createOrUpdateProduct);
+            orders.forEach(productRepository::save);
             return orders.stream().map(productConverter::toDto).toList();
         }
         return Collections.emptyList();

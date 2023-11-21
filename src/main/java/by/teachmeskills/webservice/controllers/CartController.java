@@ -7,9 +7,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,12 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/cart")
-@AllArgsConstructor
 @Validated
 @Tag(name = "cart", description = "Cart endpoints")
 public class CartController {
 
     private final CartService cartService;
+
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
+    }
 
     @Operation(
             summary = "Add product",
@@ -43,6 +46,7 @@ public class CartController {
             )
     })
     @PostMapping("/addProduct/{id}")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<CartDto> addProduct(@PathVariable @Positive int id, @RequestBody CartDto cartDto) {
         return new ResponseEntity<>(cartService.addProduct(id, cartDto), HttpStatus.OK);
     }

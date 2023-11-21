@@ -15,9 +15,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,11 +36,14 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
-@AllArgsConstructor
 @Validated
 @Tag(name = "product", description = "Product Endpoint")
 public class ProductController {
     private final ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
     @Operation(
             summary = "Find all products",
@@ -81,6 +84,7 @@ public class ProductController {
             )
     })
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ProductDto> createProduct(@RequestBody @Valid ProductDto productDto) {
         return new ResponseEntity<>(productService.createProduct(productDto), HttpStatus.CREATED);
     }
@@ -101,6 +105,7 @@ public class ProductController {
             )
     })
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ProductDto> updateProduct(@RequestBody @Valid ProductDto productDto) {
         return new ResponseEntity<>(productService.updateProduct(productDto), HttpStatus.OK);
     }
@@ -120,6 +125,7 @@ public class ProductController {
             )
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteProduct(@PathVariable @Positive int id) {
         productService.deleteProduct(id);
     }
@@ -181,9 +187,9 @@ public class ProductController {
                     description = "Products not fount - forbidden operation"
             )
     })
-    @GetMapping("/search/{searchWord}")
-    public ResponseEntity<List<ProductDto>> findProducts(@PathVariable String searchWord) {
-        return new ResponseEntity<>(productService.findProducts(searchWord), HttpStatus.OK);
+    @GetMapping("/search/{parameter}")
+    public ResponseEntity<List<ProductDto>> findProducts(@Parameter(required = true, description = "Search parameter") @PathVariable String parameter) {
+        return new ResponseEntity<>(productService.findProducts(parameter), HttpStatus.OK);
     }
 
     @Operation(
@@ -205,6 +211,7 @@ public class ProductController {
             }
     )
     @PostMapping("/csv/import")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<ProductDto>> importProductsFromCsv(@RequestParam("file") MultipartFile file) throws Exception {
         return new ResponseEntity<>(productService.importProductsFromCsv(file), HttpStatus.CREATED);
     }
@@ -228,6 +235,7 @@ public class ProductController {
             }
     )
     @GetMapping("/csv/export/{categoryId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void exportProductsToCsv(HttpServletResponse response, @Parameter(required = true, description = "Category ID")
     @PathVariable int categoryId) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
         productService.exportProductsToCsv(response, categoryId);

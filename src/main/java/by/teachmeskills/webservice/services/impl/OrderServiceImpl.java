@@ -47,19 +47,19 @@ public class OrderServiceImpl implements OrderService {
              .orElseThrow(() -> new EntityNotFoundException(String.format("Заказа с id %d не найдено.", orderDto.getId())));
      order.setOrderDate(orderDto.getOrderDate());
      order.setPrice(orderDto.getPrice());
-     return orderConverter.toDto(orderRepository.createOrUpdateOrder(order));
+     return orderConverter.toDto(orderRepository.save(order));
  }
 
     @Override
     public OrderDto createOrder(OrderDto orderDto) {
         Order order = orderConverter.fromDto(orderDto);
-        order = orderRepository.createOrUpdateOrder(order);
+        order = orderRepository.save(order);
         return orderConverter.toDto(order);
     }
 
     @Override
     public void deleteOrder(int id) {
-        orderRepository.delete(id);
+        orderRepository.deleteById(id);
     }
 
     @Override
@@ -100,20 +100,20 @@ public class OrderServiceImpl implements OrderService {
                         .toList())
                 .orElse(null);
         if (Optional.ofNullable(orders).isPresent()) {
-            orders.forEach(orderRepository::createOrUpdateOrder);
+            orders.forEach(orderRepository::save);
             return orders.stream().map(orderConverter::toDto).toList();
         }
         return Collections.emptyList();
     }
 
     @Override
-    public void exportOrdersToCsv(HttpServletResponse response, int id) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
-        List<ProductDto> products = productRepository.findByCategoryId(id).stream().map(productConverter::toDto).toList();
+    public void exportOrdersToCsv(HttpServletResponse response, int userId) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+        List<OrderDto> orderDtos = orderRepository.findByUserId(userId).stream().map(orderConverter::toDto).toList();
         try (Writer writer = new OutputStreamWriter(response.getOutputStream())) {
-            StatefulBeanToCsv<ProductDto> statefulBeanToCsv = new StatefulBeanToCsvBuilder<ProductDto>(writer).withSeparator(';').build();
+            StatefulBeanToCsv<OrderDto> statefulBeanToCsv = new StatefulBeanToCsvBuilder<OrderDto>(writer).withSeparator(';').build();
             response.setContentType("text/csv");
             response.addHeader("Content-Disposition", "attachment; filename=" + "products.csv");
-            statefulBeanToCsv.write(products);
+            statefulBeanToCsv.write(orderDtos);
         }
     }
 
